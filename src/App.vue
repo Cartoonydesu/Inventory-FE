@@ -19,37 +19,19 @@ import { onMounted, ref } from 'vue';
   }};
 </script>
 
-
 <template>
-  <h1>Get all item in your house</h1>
-  <button>Add item</button>
-  <hr>
-  <!-- <p>{{ listAll }}</p> -->
-  <!-- <v-table :data="listAll"> -->
-  <table>
-    <thead>
-      <tr>
-        <th>EAN</th>
-        <th>Title</th>
-        <th>Brand</th>
-        <th>Amount</th>
-        <th>Note</th>
-        <th>ExpiredDate</th>
-      </tr>
-      </thead>
-    <tbody>
-      <tr v-for="(row, index) in listAll" :key="index">
-        <!-- <td>{{row}}</td> -->
-        <td>{{ row.ean }}</td>
-        <td>{{ row.title }}</td>
-        <td>{{ row.brand }}</td>
-        <td>{{ row.amount }}</td>
-        <td>{{ row.note }}</td>
-        <td>{{ row.expiredDate }}</td>
-      </tr>
-    </tbody>
-  </table>
-  <!-- </v-table> -->
+  <!-- <h1>Hello App!</h1>
+  <p>
+    <strong>Current route path:</strong> {{ $route.fullPath }}
+  </p> -->
+  <nav>
+    <RouterLink to="/">Get all item</RouterLink>
+    <br>
+    <RouterLink to="/add-item">Add item</RouterLink>
+  </nav>
+  <main>
+    <RouterView />
+  </main>
 </template>
 
 <style>

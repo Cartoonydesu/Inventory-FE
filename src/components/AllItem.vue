@@ -24,7 +24,7 @@ export default {
   <h1>Get all item in your house</h1>
   <!-- <button>Add item</button> -->
   <hr />
-  <!-- <p>{{ listAll }}</p> -->
+  <!-- <p>{{ listAll.data }}</p> -->
   <!-- <v-table :data="listAll"> -->
   <table>
     <thead>
@@ -38,7 +38,7 @@ export default {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(row, index) in listAll" :key="index">
+      <tr v-for="(row, index) in listAll.data" :key="index">
         <!-- <td>{{row}}</td> -->
         <td>{{ row.ean }}</td>
         <td>{{ row.title }}</td>

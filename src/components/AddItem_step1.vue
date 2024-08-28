@@ -13,9 +13,9 @@
 // };
 export default{
     methods: {
-        emitNextStep() {
-            this.$emit('nextStep');
-        },
+        // emitNextStep() {
+        //     this.$emit('nextStep');
+        // },
         emitChoseMode(mode) {
             this.$emit('choseMode', mode);
         }
@@ -23,10 +23,10 @@ export default{
 </script>
 
 <template>
-    <h3>Choose method</h3>
-    <button @click="emitNextStep(); emitChoseMode('manual')">Manually type</button>
+    <h3>Step 1 : Please choose method</h3>
+    <button @click="emitChoseMode('manual')">Manually type</button>
     <br />
-    <button @click="emitNextStep(); emitChoseMode('barcode')">Barcode scanner</button>
+    <button @click="emitChoseMode('barcode')">Barcode scanner</button>
 </template>
 
 <style></style>

@@ -1,7 +1,7 @@
 import { createRouter } from 'vue-router'
 import AllItem from '../AllItem.vue'
-import { createMemoryHistory } from 'vue-router'
 import AddItem from '../AddItem.vue'
+import { createWebHistory } from 'vue-router/dist/vue-router'
 
 const routes = [
     {
@@ -17,7 +17,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createMemoryHistory(), 
+    history: createWebHistory(), 
     routes,
 })
 

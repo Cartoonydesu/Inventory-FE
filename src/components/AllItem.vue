@@ -26,8 +26,8 @@ export default {
   <hr />
   <!-- <p>{{ listAll.data }}</p> -->
   <!-- <v-table :data="listAll"> -->
-  <table>
-    <thead>
+  <table class="table table-striped">
+    <thead class="thead-dark">
       <tr>
         <th>EAN</th>
         <th>Title</th>

@@ -24,9 +24,9 @@ export default{
 
 <template>
     <h3>Step 1 : Please choose method</h3>
-    <button @click="emitChoseMode('manual')">Manually type</button>
-    <br />
-    <button @click="emitChoseMode('barcode')">Barcode scanner</button>
+    <button @click="emitChoseMode('manual')" class="btn btn-primary">Manually type</button>
+    <br/>
+    <button @click="emitChoseMode('barcode')" class="btn btn-primary">Barcode scanner</button>
 </template>
 
 <style></style>

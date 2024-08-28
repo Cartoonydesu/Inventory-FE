@@ -31,7 +31,7 @@ export default {
                     console.log(result)
                     ean.value = result
                     const response = await fetch(`http://localhost:8080/api/v1/upc-barcode-reader?ean=${ean.value}`)
-                    const resultRes = await response.json();
+                    const resultRes = await response.json()
                     item.value = resultRes.data
                     scanStatus.value = true
                     createItem.value.ean = item.value.ean
@@ -42,6 +42,16 @@ export default {
                     console.error(err)
                 })
         }
+        const fetchCreateItem = async () => {
+            const requestOptions = {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(createItem.value)
+            }
+            const response = await fetch(`http://localhost:8080/api/v1/items`, requestOptions)
+            const resultRes = await response.json()
+            console.log(resultRes)
+        }
         const increaseAmount = () => {
             createItem.value.amount++
         }
@@ -50,7 +60,7 @@ export default {
         }
         return {
             ean, item, createItem, scanStatus,
-            startScanning, increaseAmount, decreaseAmount
+            startScanning, increaseAmount, decreaseAmount, fetchCreateItem
         }
     },
     // mounted() {
@@ -86,12 +96,14 @@ export default {
         <div class="row mb-4">
             <div class="col-6">
                 <div class="mb-3">
-                    <video id="video"/>
+                    <video id="video" style="width:100%"/>
                 </div>
                 <!-- <br> -->
                 <div style="text-align: center;">
                     <button id="start-button" @click="startScanning" class="btn btn-secondary">Start scanning</button>
                 </div>
+                <div>{{ ean }}</div>
+                <div>{{ createItem }}</div>
             </div>
             <div class="col-6">
                 <label>EAN id </label>
@@ -118,7 +130,7 @@ export default {
                 <label>Note </label>
                 <textarea type="text" class="form-control mb-3" placeholder="Enter note..." v-model="createItem.note" />
                 <label>Expired date </label>
-                <div class="form-group input-group">
+                <div class="form-group input-group mb-4">
                     <div class="inpur-group-prepend">
                         <span class="input-group-text">
                             <i class="bi bi-calendar"></i>
@@ -128,7 +140,7 @@ export default {
                         placeholder="Choose expired date..." />
                 </div>
                 <div style="text-align: right;">
-                    <button class="btn btn-success">Add item</button>
+                    <button class="btn btn-success" @click="fetchCreateItem">Add item</button>
                 </div>
             </div>
         </div>

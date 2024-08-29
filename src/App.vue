@@ -1,5 +1,6 @@
 <script>
 import { onMounted, ref } from 'vue';
+// import 'https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js'
 
 export default {
   setup() {
@@ -22,6 +23,7 @@ export default {
 
 
 <template>
+  
   <!-- <link rel=”stylesheet” href=”https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css”/> -->
   <!-- <h1>Hello App!</h1>
   <p>

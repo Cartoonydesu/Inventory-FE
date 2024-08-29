@@ -2,33 +2,44 @@
 <script>
 import { BrowserMultiFormatReader } from '@zxing/library';
 import { ref } from 'vue';
-import 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css';
 import $ from 'jquery';
 import 'bootstrap-datepicker';
+
+window.$ = window.jQuery = $;
 
 export default {
     methods: {
         emitNextStep() {
             this.$emit('nextStep')
-        }
+        },
+        // showModal() {
+        //     $(this.$refs.myModal).modal('show');
+        // },
+        // hideMclose() {
+        //     $(this.$refs.myModal).modal('hide');
+        // }
     },
     setup() {
         const codeReader = new BrowserMultiFormatReader()
         const ean = ref()
         const item = ref()
         const scanStatus = ref(false)
+        const showModal = ref(false)
         const createItem = ref({
-            ean: "",
-            title: "",
-            brand: "",
+            ean: null,
+            title: null,
+            brand: null,
             amount: 1,
-            note: "",
-            expiredDate: ""
+            note: null,
+            expiredDate: null
         })
+        // onMounted(() => {
+        //     showModal.value = true;
+        // });
+
         const startScanning = () => {
             codeReader.decodeOnceFromVideoDevice(undefined, 'video')
                 .then(async result => {
-                    console.log(result)
                     ean.value = result
                     const response = await fetch(`http://localhost:8080/api/v1/upc-barcode-reader?ean=${ean.value}`)
                     const resultRes = await response.json()
@@ -45,12 +56,13 @@ export default {
         const fetchCreateItem = async () => {
             const requestOptions = {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(createItem.value)
             }
             const response = await fetch(`http://localhost:8080/api/v1/items`, requestOptions)
             const resultRes = await response.json()
             console.log(resultRes)
+            showModal.value = true;
         }
         const increaseAmount = () => {
             createItem.value.amount++
@@ -58,31 +70,33 @@ export default {
         const decreaseAmount = () => {
             createItem.value.amount--
         }
+        // const openModal = () => {
+        //     showModal.value = true;
+        // }
+        const closeModal = () => {
+            showModal.value = false;
+            createItem.value = {
+                ean: null,
+                title: null,
+                brand: null,
+                amount: 1,
+                note: null,
+                expiredDate: null
+            }
+            scanStatus.value = false
+            startScanning()
+        };
         return {
-            ean, item, createItem, scanStatus,
-            startScanning, increaseAmount, decreaseAmount, fetchCreateItem
+            ean, item, createItem, scanStatus, showModal,
+            startScanning, increaseAmount, decreaseAmount, fetchCreateItem, closeModal
         }
     },
-    // mounted() {
-    //     $('#datepicker').datepicker({
-    //         format: 'yyyy-mm-dd', // Date format
-    //         autoclose: false,      // Automatically close after selecting a date
-    //         // todayHighlight: true, // Highlight today
-    //     }).on('changeDate', (event) => {
-    //         createItem.value.expiredDate = event.format('yyyy-mm-dd')
-    //     });
-    // },
-    // watch: {
-    //     expiredDate (newDate) {
-    //         $('#datepicker').datepicker('update', newDate);
-    //     }
-    // }
     mounted() {
         const vm = this
         $('#datepicker').datepicker({
             format: 'yyyy-mm-dd', // Date format
             autoclose: false,      // Automatically close after selecting a date
-        }).on('changeDate', function (event) {
+        }).on('changeDate', function () {
             vm.createItem.expiredDate = $(this).datepicker('getFormattedDate');
         });
 
@@ -91,16 +105,45 @@ export default {
 </script>
 
 <template>
+    <div>
+        <transition name="fade">
+            <div class="modal fade" :class="{ show: showModal }" tabindex="-1" role="dialog" style="display: block;"
+                v-if="showModal">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add item successful</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p><b>{{ createItem.title }}</b> was added</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" @click="closeModal">Add more item</button>
+                            <a href="/">
+                                <button type="button" class="btn btn-secondary" href="/">Close</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        <transition name="fade">
+            <div class="modal-backdrop fade" :class="{ show: showModal }" v-if="showModal"></div>
+        </transition>
+    </div>
+
+
     <div class="container-fluid">
         <!-- <h3>Step 2 : Please scan the barcode</h3> -->
         <div class="row mb-4">
             <div class="col-6">
                 <div class="mb-3">
-                    <video id="video" style="width:100%"/>
+                    <video id="video" style="width:100%" />
                 </div>
                 <!-- <br> -->
                 <div style="text-align: center;">
-                    <button id="start-button" @click="startScanning" class="btn btn-secondary">Start scanning</button>
+                    <button id="start-button" @click="startScanning" class="btn btn-secondary">Start
+                        scanning</button>
                 </div>
                 <div>{{ ean }}</div>
                 <div>{{ createItem }}</div>
@@ -110,12 +153,14 @@ export default {
                 <input type="text" class="form-control mb-3" placeholder="Enter EAN id..." v-model="createItem.ean"
                     :disabled="scanStatus" />
                 <label>Product name </label>
+                <label class="required">*</label>
                 <input type="text" class="form-control mb-3" placeholder="Enter product name..."
-                    v-model="createItem.title" :disabled="scanStatus" />
+                v-model="createItem.title" :disabled="scanStatus" />
                 <label>Product brand </label>
                 <input type="text" class="form-control mb-3" placeholder="Enter product brand..."
-                    v-model="createItem.brand" :disabled="scanStatus" />
+                v-model="createItem.brand" :disabled="scanStatus" />
                 <label>Amount </label>
+                <label class="required">*</label>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <button class="btn btn-light" type="button" @click="decreaseAmount"
@@ -140,19 +185,10 @@ export default {
                         placeholder="Choose expired date..." />
                 </div>
                 <div style="text-align: right;">
-                    <button class="btn btn-success" @click="fetchCreateItem">Add item</button>
+                    <button class="btn btn-success" @click="fetchCreateItem" :disabled="createItem.amount == 0 || createItem.title == null">Add item</button>
                 </div>
             </div>
         </div>
-        <!-- <div class="row">
-            <div class="col-6" style="text-align: center;">
-                <button id="start-button" @click="startScanning" class="btn btn-secondary">Start scanning</button>
-            </div>
-            <div class="col-6" style="text-align: right;">
-                <button class="btn btn-success">Add item</button>
-            </div>
-        </div> -->
-
     </div>
 </template>
 
@@ -167,12 +203,6 @@ input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
-
-/* input {
-    white-space: nowrap; 
-    overflow-x: auto;
-} */
-
 
 .datepicker {
     font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -224,5 +254,22 @@ input[type="number"]::-webkit-inner-spin-button {
     /* Header background color */
     color: white;
     /* Header text color */
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 1s ease;
+}
+
+.fade-enter,
+.fade-leave-to
+
+/* .fade-leave-active in <2.1.8 */
+    {
+    opacity: 0;
+}
+
+.required{
+    color: red;
 }
 </style>

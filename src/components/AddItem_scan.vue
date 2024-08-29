@@ -1,23 +1,19 @@
 <!-- <script src="https://unpkg.com/@zxing/library@latest"></script> -->
 <script>
 import { BrowserMultiFormatReader } from '@zxing/library';
-import { ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import $ from 'jquery';
 import 'bootstrap-datepicker';
 
 window.$ = window.jQuery = $;
 
 export default {
+    components: {
+    },
     methods: {
         emitNextStep() {
             this.$emit('nextStep')
         },
-        // showModal() {
-        //     $(this.$refs.myModal).modal('show');
-        // },
-        // hideMclose() {
-        //     $(this.$refs.myModal).modal('hide');
-        // }
     },
     setup() {
         const codeReader = new BrowserMultiFormatReader()
@@ -33,9 +29,6 @@ export default {
             note: null,
             expiredDate: null
         })
-        // onMounted(() => {
-        //     showModal.value = true;
-        // });
 
         const startScanning = () => {
             codeReader.decodeOnceFromVideoDevice(undefined, 'video')
@@ -59,7 +52,7 @@ export default {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(createItem.value)
             }
-            const response = await fetch(`http://localhost:8080/api/v1/items`, requestOptions)
+            const response = await fetch(`${process.env.VUE_APP_URL}/api/v1/items`, requestOptions)
             const resultRes = await response.json()
             console.log(resultRes)
             showModal.value = true;
@@ -70,9 +63,6 @@ export default {
         const decreaseAmount = () => {
             createItem.value.amount--
         }
-        // const openModal = () => {
-        //     showModal.value = true;
-        // }
         const closeModal = () => {
             showModal.value = false;
             createItem.value = {
@@ -85,7 +75,15 @@ export default {
             }
             scanStatus.value = false
             startScanning()
+        }
+        const stopScanning = () => {
+            if (codeReader && codeReader.reset) {
+                codeReader.reset(); // Reset the codeReader to stop scanning and release resources
+            }
         };
+        onBeforeUnmount(() => {
+            stopScanning(); // Stop scanning when the component is unmounted
+        });
         return {
             ean, item, createItem, scanStatus, showModal,
             startScanning, increaseAmount, decreaseAmount, fetchCreateItem, closeModal
@@ -106,6 +104,9 @@ export default {
 
 <template>
     <div>
+        <!-- <App_modal
+        showModal="showModal"
+        modalHeader=""/> -->
         <transition name="fade">
             <div class="modal fade" :class="{ show: showModal }" tabindex="-1" role="dialog" style="display: block;"
                 v-if="showModal">
@@ -145,8 +146,8 @@ export default {
                     <button id="start-button" @click="startScanning" class="btn btn-secondary">Start
                         scanning</button>
                 </div>
-                <div>{{ ean }}</div>
-                <div>{{ createItem }}</div>
+                <!-- <div>{{ ean }}</div>
+                <div>{{ createItem }}</div> -->
             </div>
             <div class="col-6">
                 <label>EAN id </label>

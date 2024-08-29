@@ -1,11 +1,11 @@
 <script>
 import { ref } from "vue";
 // import AddItem_step1 from "./AddItem_step1.vue";
-import AddItem_scan_step2 from "./AddItem_scan_step2.vue";
+import AddItem_scan from "./AddItem_scan.vue";
 export default {
     components: {
         // AddItem_step1,
-        AddItem_scan_step2
+        AddItem_scan
     },
     setup() {
         const step = ref(1);
@@ -28,7 +28,7 @@ export default {
     <div class="container-fluid">
         <h1>Add item to your house's inventory</h1>
     </div>
-    <AddItem_scan_step2 />
+    <AddItem_scan />
 </template>
 
 <style></style>

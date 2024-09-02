@@ -25,9 +25,10 @@ export default {
 </script>
 
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid mb-3">
         <h1>Add item to your house's inventory</h1>
     </div>
+    <hr>
     <AddItem_scan />
 </template>
 

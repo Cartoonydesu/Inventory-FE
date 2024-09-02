@@ -33,14 +33,21 @@ export default {
         const startScanning = () => {
             codeReader.decodeOnceFromVideoDevice(undefined, 'video')
                 .then(async result => {
+                    // createItem = null
                     ean.value = result
                     const response = await fetch(`http://localhost:8080/api/v1/upc-barcode-reader?ean=${ean.value}`)
                     const resultRes = await response.json()
-                    item.value = resultRes.data
-                    scanStatus.value = true
-                    createItem.value.ean = item.value.ean
-                    createItem.value.title = item.value.title
-                    createItem.value.brand = item.value.brand
+                    createItem.value.ean = ean.value
+                    console.log(resultRes)
+                    if (resultRes.data != null) {
+                        item.value = resultRes.data
+                        scanStatus.value = true
+                        createItem.value.title = item.value.title
+                        createItem.value.brand = item.value.brand
+                    } else {
+                        createItem.value.title = null
+                        createItem.value.brand = null
+                    }
                 })
                 .catch(err => {
                     console.error(err)
@@ -104,9 +111,6 @@ export default {
 
 <template>
     <div>
-        <!-- <App_modal
-        showModal="showModal"
-        modalHeader=""/> -->
         <transition name="fade">
             <div class="modal fade" :class="{ show: showModal }" tabindex="-1" role="dialog" style="display: block;"
                 v-if="showModal">
@@ -135,31 +139,27 @@ export default {
 
 
     <div class="container-fluid">
-        <!-- <h3>Step 2 : Please scan the barcode</h3> -->
         <div class="row mb-4">
             <div class="col-6">
                 <div class="mb-3">
                     <video id="video" style="width:100%" />
                 </div>
-                <!-- <br> -->
                 <div style="text-align: center;">
                     <button id="start-button" @click="startScanning" class="btn btn-secondary">Start
                         scanning</button>
                 </div>
-                <!-- <div>{{ ean }}</div>
-                <div>{{ createItem }}</div> -->
             </div>
             <div class="col-6">
                 <label>EAN id </label>
                 <input type="text" class="form-control mb-3" placeholder="Enter EAN id..." v-model="createItem.ean"
-                    :disabled="scanStatus" />
+                    :disabled="ean != null" />
                 <label>Product name </label>
                 <label class="required">*</label>
                 <input type="text" class="form-control mb-3" placeholder="Enter product name..."
-                v-model="createItem.title" :disabled="scanStatus" />
+                    v-model="createItem.title" :disabled="createItem.title != null" />
                 <label>Product brand </label>
                 <input type="text" class="form-control mb-3" placeholder="Enter product brand..."
-                v-model="createItem.brand" :disabled="scanStatus" />
+                    v-model="createItem.brand" :disabled="createItem.title != null" />
                 <label>Amount </label>
                 <label class="required">*</label>
                 <div class="input-group mb-3">
@@ -186,7 +186,8 @@ export default {
                         placeholder="Choose expired date..." />
                 </div>
                 <div style="text-align: right;">
-                    <button class="btn btn-success" @click="fetchCreateItem" :disabled="createItem.amount == 0 || createItem.title == null">Add item</button>
+                    <button class="btn btn-success" @click="fetchCreateItem"
+                        :disabled="createItem.amount == 0 || createItem.title == null">Add item</button>
                 </div>
             </div>
         </div>
@@ -270,7 +271,7 @@ input[type="number"]::-webkit-inner-spin-button {
     opacity: 0;
 }
 
-.required{
+.required {
     color: red;
 }
 </style>

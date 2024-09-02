@@ -43,7 +43,7 @@ export default {
 <template>
   <h1>Get all item in your house</h1>
   <!-- <button>Add item</button> -->
-  <hr />
+  <hr/>
   <!-- <p>{{ listAll.data }}</p> -->
   <!-- <v-table :data="listAll"> -->
   <table class="table table-striped">
